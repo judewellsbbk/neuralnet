@@ -62,6 +62,10 @@ weights_0 = {'node_0':[1,1],
              }
 
 def relu(n):
+    '''This function ensures that the output cannot be less than zero
+        There is no particular reason why I've chosen to apply this function
+        other than the fact that it is included in the datacamp example
+    '''
     return max(0,n)
 
 def predict_with_network(input_data_point, weights):
