@@ -21,6 +21,16 @@
 # After all weights have been adjusted repeat process of forward propagation, calculate error
 # and back propagation until slope = 0
 
+#=CALCULATING THE SLOPE=
+'''To calculate the slope for a weight we need to multiply:
+        1) The slope of the loss function with respect to the value at the node we feed into (see below).
+        2) The value of the node that feeds into our weight
+        3) The slope of the activation function with respect to the value we feed into
+            (in the case of relu() this last element will always be 0 or 1) - we will ignore this step for now
+
+    To work out point 1 above calculate: 2 * Error
+
+'''
 
 import pandas as pd
 import numpy as np
@@ -44,6 +54,8 @@ print('Target list: ', target_list)
 
 input_data = np.array([4, 8]) #A simple single input to test the predict_with_network function
 
+#The weights are the only things we change to make the network generate more accurate predictions.
+#In the current model we only have 1 hidden layer with 2 nodes.
 weights_0 = {'node_0':[1,1],
              'node_1':[1,1],
              'output':[1,1]
@@ -69,11 +81,11 @@ def predict_with_network(input_data_point, weights):
     input_to_final_layer = (hidden_layer_values * weights['output']).sum()
     model_output = relu(input_to_final_layer)
 
-    return (model_output)
+    return (model_output, hidden_layer_values)
 
 
 
-model_output_1 = predict_with_network(input_data, weights_0)
+model_output_1 = predict_with_network(input_data, weights_0)[0]
 
 print('model output 1 = ', model_output_1)
 
@@ -81,8 +93,8 @@ model_output_list = []
 
 # Loop over input_data
 for row in input_data_arrays:
-    # Append prediction to model_output_0
-    model_output_list.append(predict_with_network(row, weights_0))
+    # Append prediction to model_output_list
+    model_output_list.append(predict_with_network(row, weights_0)[0])
 
 print('model output list: ', model_output_list) #List of predictions
 print('Length of output list: ', len(model_output_list))
@@ -93,3 +105,45 @@ print('List of errors: ', [np.asarray(model_output_list) - np.asarray(target_lis
 mse = mean_squared_error(target_list, model_output_list)
 
 print('mse= ', mse)
+
+
+# lets try and write a weight adjusting process that works with just one input:
+learning_rate = 0.1
+target1 = sum(input_data)
+prediction1, hidden_layer = predict_with_network(input_data, weights_0)
+error1 = prediction1 - target1
+print('Input data: ', input_data)
+print('Target1: ', target1)
+print('Prediction1: ', prediction1)
+print('Error:', error1)
+print('Weights: ', weights_0)
+print('Hidden Layer: ', hidden_layer)
+
+
+
+
+#These steps below calculate the gradient at output and adjust the last set of weights accordingly:
+gradient_at_output = 2 * hidden_layer * error1
+print('Gradient at output:', gradient_at_output)
+print('Type gradient at output:', type(gradient_at_output))
+print('Gradient at output[0]:', gradient_at_output[0])
+weights_0['output'] = weights_0['output'] - (gradient_at_output * 0.01)
+print('Adjusted weights:', weights_0)
+
+#This while loop repeats the steps outlined above until the gradient is close to zero
+while abs(gradient_at_output[0]) > 0.1:
+    print('-----NEW ROUND-----')
+    prediction1, hidden_layer = predict_with_network(input_data, weights_0)
+    error1 = prediction1 - target1
+    gradient_at_output = 2 * hidden_layer * error1
+    print('Gradient at output:', gradient_at_output)
+    weights_0['output'] = weights_0['output'] - (gradient_at_output * 0.001)
+    print('Adjusted weights:', weights_0)
+    print('Prediction1: ', prediction1)
+    print('Error:', error1)
+
+
+
+
+
+
