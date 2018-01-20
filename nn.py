@@ -14,7 +14,8 @@
 # Calculate mean squared error for all individual errors
 
 # =BACK PROPAGATION=
-# Calculate the slope of loss function at the output and adjust weights by weight - (slope * learning rate)
+# Calculate the slope of loss function at the output and adjust weights
+    # by subtracting slope * learning rate. -> weight = weight - (slope * learning_rate)
 # Repeat this process going back towards the input adjusting the weights at each layer.
 
 # After all weights have been adjusted repeat process of forward propagation, calculate error
@@ -24,6 +25,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_squared_error
+
 
 prods = pd.read_csv('product.csv')
 
@@ -37,10 +39,10 @@ for row in prods.itertuples():
 
 
 
-print(input_data_arrays)
-print(target_list)
+print('List of input arrays: ',input_data_arrays)
+print('Target list: ', target_list)
 
-input_data = np.array([2, 3]) #A simple single input to test the predict_with_network function
+input_data = np.array([4, 8]) #A simple single input to test the predict_with_network function
 
 weights_0 = {'node_0':[1,1],
              'node_1':[1,1],
@@ -55,7 +57,7 @@ def predict_with_network(input_data_point, weights):
     and a set of weights for 2 nodes + 1 output.
     This function was copied direct from datacamp.
     Note the use of the 'relu' function which returns 0 if n<0 else returns n
-    I think the data points must be in the form of numpy array in order to multiply with the weights
+    The data points must be in the form of numpy arrays in order to multiply with the weights
     '''
     node_0_input = (input_data_point * weights['node_0']).sum()
     node_0_output = relu(node_0_input)
@@ -75,14 +77,19 @@ model_output_1 = predict_with_network(input_data, weights_0)
 
 print('model output 1 = ', model_output_1)
 
-model_output_error_list = []
+model_output_list = []
 
 # Loop over input_data
 for row in input_data_arrays:
     # Append prediction to model_output_0
-    model_output_error_list.append(predict_with_network(row, weights_0))
+    model_output_list.append(predict_with_network(row, weights_0))
+
+print('model output list: ', model_output_list) #List of predictions
+print('Length of output list: ', len(model_output_list))
+print('Mean of output list: ',np.mean(model_output_list))
+print('List of errors: ', [np.asarray(model_output_list) - np.asarray(target_list)])
 
 # Calculate the mean squared error for model_output_0: mse_0
-mse = mean_squared_error(target_list, model_output_error_list)
+mse = mean_squared_error(target_list, model_output_list)
 
 print('mse= ', mse)
