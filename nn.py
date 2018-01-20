@@ -108,7 +108,6 @@ print('mse= ', mse)
 
 
 # lets try and write a weight adjusting process that works with just one input:
-learning_rate = 0.1
 target1 = sum(input_data)
 prediction1, hidden_layer = predict_with_network(input_data, weights_0)
 error1 = prediction1 - target1
@@ -119,14 +118,9 @@ print('Error:', error1)
 print('Weights: ', weights_0)
 print('Hidden Layer: ', hidden_layer)
 
-
-
-
 #These steps below calculate the gradient at output and adjust the last set of weights accordingly:
 gradient_at_output = 2 * hidden_layer * error1
 print('Gradient at output:', gradient_at_output)
-print('Type gradient at output:', type(gradient_at_output))
-print('Gradient at output[0]:', gradient_at_output[0])
 weights_0['output'] = weights_0['output'] - (gradient_at_output * 0.01)
 print('Adjusted weights:', weights_0)
 
