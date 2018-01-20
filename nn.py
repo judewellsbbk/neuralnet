@@ -8,10 +8,10 @@ print(prods.head())
 #we want to run the model on each set of inputs and calculate the 'error':
 #Take each row split into input a, input b and target.
 #Run a & b through the nodes to calculate the output.
-#Each node is calculated by taking the sum of inputs * weights from previous layer
+#Each node is calculated by taking the sum of inputs * weights from previous layer (and possibly applying a function eg. relu)
 
 #=CALCULATE ERROR=
-#Calculate the error for each row (pair of inputs) by calculating output and subtracting from target
+#Calculate the error for each row (pair of inputs) by calculating predicted - target
 #Store a list of errors in a list
 #Calculate mean squared error for all individual errors
 
