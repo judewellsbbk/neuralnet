@@ -56,9 +56,9 @@ input_data = np.array([4, 8]) #A simple single input to test the predict_with_ne
 
 #The weights are the only things we change to make the network generate more accurate predictions.
 #In the current model we only have 1 hidden layer with 2 nodes.
-weights_0 = {'node_0':[1,1],
-             'node_1':[1,1],
-             'output':[1,1]
+weights_0 = {'node_0':[3, 1],
+             'node_1':[0.5, 1],
+             'output':[1,2]
              }
 
 def relu(n):
@@ -111,7 +111,9 @@ mse = mean_squared_error(target_list, model_output_list)
 print('mse= ', mse)
 
 
-# lets try and write a weight adjusting process that works with just one input:
+# lets try and write a weight adjusting process that works with just one input.
+#The code below makes a prediction, calculates the error and prints an overview
+#of the state of the network
 target1 = sum(input_data)
 prediction1, hidden_layer = predict_with_network(input_data, weights_0)
 error1 = prediction1 - target1
@@ -128,7 +130,7 @@ print('Gradient at output:', gradient_at_output)
 weights_0['output'] = weights_0['output'] - (gradient_at_output * 0.01)
 print('Adjusted weights:', weights_0)
 
-#This while loop repeats the steps outlined above until the gradient is close to zero
+#This while loop repeats the steps outlined above until the gradient is close to zero, note that we have not applied the relu function:
 while abs(gradient_at_output[0]) > 0.1:
     print('-----NEW ROUND-----')
     prediction1, hidden_layer = predict_with_network(input_data, weights_0)
@@ -136,12 +138,55 @@ while abs(gradient_at_output[0]) > 0.1:
     gradient_at_output = 2 * hidden_layer * error1
     print('Gradient at output:', gradient_at_output)
     weights_0['output'] = weights_0['output'] - (gradient_at_output * 0.001)
-    print('Adjusted weights:', weights_0)
     print('Prediction1: ', prediction1)
     print('Error:', error1)
 
+    '''
+    #attempted to add back propagation to adjust weights to hidden layer here but it broke the model
+    gradient_node_0 = input_data * gradient_at_output[0]
+    gradient_node_1 = input_data * gradient_at_output[1]
+    print('Gradient used to adjust 4 weights going to hidden layer: ', gradient_node_0, gradient_node_1)
+
+    weights_0['node_0'] = weights_0['node_0'] - (gradient_node_0 * 0.001)
+    weights_0['node_1'] = weights_0['node_1'] - (gradient_node_1 * 0.001)   
+    '''
+    print('Adjusted weights:', weights_0)
 
 
 
+    #weights_0['node_0'] =
+'''
+    weights_0 = {'node_0': [3, 1],
+                 'node_1': [0.5, 1],
+                 'output': [1, 2]
+                 }
+'''
+
+#Ok now lets break-up some of the above code into functions:
+
+def get_error(input_data, target, weights):
+    #This function returns the error
+    preds = (weights * input_data).sum()
+    error = preds - target
+    return(error)
+
+def get_slope(input_data, target, weights):
+    #This function returns the slope
+    error = get_error(input_data, target, weights)
+    slope = 2 * input_data * error
+    return(slope)
+
+
+'''Back propagation process taken from datacamp:
+        Go back one layer at a time
+        
+        Gradients for weight is product of:
+            
+            1) Node value feeding into that weight
+            2) Slope of the loss function with respect to the node it feeds into
+            3) Slope of the activation function at the node it feeds into
+    
+    Slope of node values are the sum of the slopes for all weights that come out of them
+'''
 
 
